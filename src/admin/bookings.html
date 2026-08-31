@@ -1,0 +1,51 @@
+<section class="page-head row admin-head">
+  <div>
+    <p class="eyebrow">Admin / Bookings</p>
+    <h1>View bookings</h1>
+  </div>
+</section>
+
+<section class="section">
+  <div class="card glass panel">
+    <div class="filter-row bookings-filters">
+      <div class="field">
+        <label class="visually-hidden" for="filter-barber">Filter by barber</label>
+        <select id="filter-barber">
+          <option value="">All barbers</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="visually-hidden" for="filter-date">Filter by date</label>
+        <input id="filter-date" type="date" />
+      </div>
+      <div class="field">
+        <label class="visually-hidden" for="filter-status">Filter by status</label>
+        <select id="filter-status">
+          <option value="">All statuses</option>
+          <option value="confirmed">Confirmed</option>
+          <option value="completed">Completed</option>
+          <option value="cancelled">Cancelled</option>
+          <option value="no-show">No-show</option>
+        </select>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table class="data-table" id="bookings-table">
+        <caption class="visually-hidden">List of customer bookings</caption>
+        <thead>
+          <tr>
+            <th scope="col">Booking</th>
+            <th scope="col">Customer</th>
+            <th scope="col">Service</th>
+            <th scope="col">Barber</th>
+            <th scope="col">When</th>
+            <th scope="col">Price</th>
+            <th scope="col">Status</th>
+          </tr>
+        </thead>
+        <tbody id="bookings-tbody"></tbody>
+      </table>
+    </div>
+    <p class="empty-state" id="bookings-empty" hidden>No bookings match.</p>
+  </div>
+</section>

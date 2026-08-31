@@ -1,0 +1,16 @@
+# Dependencies
+node_modules/
+
+# Build output (vite)
+dist/
+
+# Logs & OS junk
+*.log
+.DS_Store
+Thumbs.db
+
+# Local scratch / debug scripts
+anim_probe.mjs
+check_splash.mjs
+check_styles.mjs
+check_timeline.mjs

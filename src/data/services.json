@@ -1,0 +1,66 @@
+[
+  {
+    "id": "svc-classic",
+    "name": "Classic Haircut",
+    "emoji": "&#9995;",
+    "duration": 30,
+    "price": 150,
+    "description": "Precision scissor & clipper cut finished with a sharp line-up and styled to your preference."
+  },
+  {
+    "id": "svc-beard",
+    "name": "Beard Trim & Shave",
+    "emoji": "&#9996;",
+    "duration": 25,
+    "price": 100,
+    "description": "Shape, trim and hot-towel smooth shave with premium balm — a barber's ritual."
+  },
+  {
+    "id": "svc-combo",
+    "name": "Hair + Beard Combo",
+    "emoji": "&#11088;",
+    "duration": 50,
+    "price": 240,
+    "description": "The full refresh: classic haircut plus beard sculpt. Save on the pair."
+  },
+  {
+    "id": "svc-fade",
+    "name": "Skin Fade & Design",
+    "emoji": "&#9874;",
+    "duration": 30,
+    "price": 200,
+    "description": "Sharp zero-fade blending with optional razor line design etched fresh."
+  },
+  {
+    "id": "svc-royal",
+    "name": "Royal Hot-Towel Shave",
+    "emoji": "&#129663;",
+    "duration": 30,
+    "price": 180,
+    "description": "Layered hot towels, straight-razor shave and a cooling balm masterclass."
+  },
+  {
+    "id": "svc-kids",
+    "name": "Kids Haircut",
+    "emoji": "&#129492;",
+    "duration": 20,
+    "price": 120,
+    "description": "Patient, friendly styling for the little ones — clean cut with zero tears."
+  },
+  {
+    "id": "svc-colour",
+    "name": "Hair Colouring",
+    "emoji": "&#127912;",
+    "duration": 60,
+    "price": 500,
+    "description": "Full colour service with brand-safe ammonia-free products and toner."
+  },
+  {
+    "id": "svc-massage",
+    "name": "Head Massage Ritual",
+    "emoji": "&#128566;",
+    "duration": 20,
+    "price": 140,
+    "description": "Deep-tissue scalp and temple massage to unwind mid-bookings."
+  }
+]

@@ -1,0 +1,67 @@
+[
+  {
+    "id": "barber-arjun",
+    "name": "Arjun",
+    "role": "Master Barber",
+    "years": 9,
+    "specialty": "Skin fades, classic cuts",
+    "color": "#7c5cff",
+    "emoji": "👨",
+    "workingDays": [1, 2, 3, 4, 5, 6],
+    "startMinute": 570,
+    "endMinute": 1230,
+    "active": true
+  },
+  {
+    "id": "barber-ravi",
+    "name": "Ravi",
+    "role": "Beard Specialist",
+    "years": 6,
+    "specialty": "Beard sculpting, hot-towel shaves",
+    "color": "#ff7a59",
+    "emoji": "🧑",
+    "workingDays": [1, 2, 3, 4, 5, 6, 0],
+    "startMinute": 600,
+    "endMinute": 1200,
+    "active": true
+  },
+  {
+    "id": "barber-vikram",
+    "name": "Vikram",
+    "role": "Styling & Colour Expert",
+    "years": 8,
+    "specialty": "Hair colouring, groom styling",
+    "color": "#00c2a8",
+    "emoji": "🧔",
+    "workingDays": [1, 2, 3, 4, 5],
+    "startMinute": 570,
+    "endMinute": 1230,
+    "active": true
+  },
+  {
+    "id": "barber-sameer",
+    "name": "Sameer",
+    "role": "Kids & Classic Cuts",
+    "years": 5,
+    "specialty": "Kids cuts, classic clipper work",
+    "color": "#38b6ff",
+    "emoji": "👦",
+    "workingDays": [1, 2, 3, 4, 5, 6],
+    "startMinute": 540,
+    "endMinute": 1140,
+    "active": true
+  },
+  {
+    "id": "barber-imran",
+    "name": "Imran",
+    "role": "Grooming & Rituals",
+    "years": 7,
+    "specialty": "Royal shaves, head massages",
+    "color": "#f5b201",
+    "emoji": "🧕",
+    "workingDays": [1, 2, 3, 4, 5, 6, 0],
+    "startMinute": 600,
+    "endMinute": 1230,
+    "active": false
+  }
+]

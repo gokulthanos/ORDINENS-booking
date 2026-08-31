@@ -1,0 +1,15 @@
+{
+  "name": "ordinens-tech-owner-app",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Ordinens Tech — Shop Owner Management Application",
+  "scripts": {
+    "dev": "vite --port 5174",
+    "build": "vite build",
+    "preview": "vite preview --port 4174"
+  },
+  "devDependencies": {
+    "vite": "^5.4.11"
+  }
+}

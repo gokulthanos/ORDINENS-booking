@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Ordinens Tech — Platform Admin Panel. Manage customers, shops, barbers, services, bookings, payments, issues and platform reports."
+    />
+    <meta name="theme-color" content="#0b0c14" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <meta property="og:title" content="Ordinens Tech — Admin Panel" />
+    <meta property="og:description" content="Internal control center for the Ordinens Tech platform." />
+    <title>Ordinens Tech — Admin Panel</title>
+  </head>
+  <body>
+    <!-- Toast container (global) -->
+    <div id="ad-toast-wrap" aria-live="polite" aria-atomic="false"></div>
+
+    <!-- Confirm dialog (global, accessible) -->
+    <div id="ad-confirm" class="ad-modal" role="dialog" aria-modal="true" aria-labelledby="ad-confirm-title" hidden>
+      <div class="ad-modal-backdrop" data-close-dialog></div>
+      <div class="ad-modal-panel ad-confirm-panel" role="document">
+        <h2 id="ad-confirm-title" class="ad-confirm-title"></h2>
+        <p id="ad-confirm-message" class="ad-confirm-message"></p>
+        <div class="ad-confirm-actions">
+          <button type="button" class="ad-btn ad-btn-ghost" id="ad-confirm-cancel">Cancel</button>
+          <button type="button" class="ad-btn ad-btn-danger" id="ad-confirm-ok">Confirm</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- App root -->
+    <div id="app" tabindex="-1"></div>
+
+    <script type="module" src="./src/app.js"></script>
+  </body>
+</html>

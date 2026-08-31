@@ -1,0 +1,102 @@
+[
+  {
+    "id": "shop-kings",
+    "name": "Kings Barber Studio",
+    "shopType": "barber shop",
+    "phone": "+91 98765 10001",
+    "address": "123 Main Road, Madukkarai, Coimbatore",
+    "description": "Premium grooming studio offering classic cuts, beard styling and facials. Walk in or book ahead to skip the wait.",
+    "location": "Coimbatore",
+    "area": "Madukkarai",
+    "status": "open",
+    "capacity": 3,
+    "bookingWindow": 30,
+    "cancellationHours": 2,
+    "workingHours": {
+      "sun": { "open": false, "start": "09:00", "end": "21:00" },
+      "mon": { "open": true, "start": "09:00", "end": "21:00" },
+      "tue": { "open": true, "start": "09:00", "end": "21:00" },
+      "wed": { "open": true, "start": "09:00", "end": "21:00" },
+      "thu": { "open": true, "start": "09:00", "end": "21:00" },
+      "fri": { "open": true, "start": "09:00", "end": "21:00" },
+      "sat": { "open": true, "start": "09:00", "end": "21:00" }
+    },
+    "breaks": [
+      { "id": "brk-lunch", "label": "Lunch Break", "start": "13:00", "end": "14:00" },
+      { "id": "brk-tea", "label": "Tea Break", "start": "16:00", "end": "16:30" }
+    ],
+    "services": [
+      { "id": "svc-classic", "name": "Classic Cut", "price": 150, "duration": 30, "active": true },
+      { "id": "svc-beard", "name": "Beard Trim", "price": 100, "duration": 25, "active": true },
+      { "id": "svc-combo", "name": "Hair + Beard", "price": 240, "duration": 50, "active": true },
+      { "id": "svc-fade", "name": "Skin Fade", "price": 200, "duration": 30, "active": true }
+    ],
+    "onboarded": true
+  },
+  {
+    "id": "shop-elite",
+    "name": "Elite Cuts",
+    "shopType": "salon",
+    "phone": "+91 98765 10002",
+    "address": "45 Gandhi Street, Thirumalayampalayam, Coimbatore",
+    "description": "Modern salon with sharp fades and styling for the whole family.",
+    "location": "Coimbatore",
+    "area": "Thirumalayampalayam",
+    "status": "open",
+    "capacity": 2,
+    "bookingWindow": 30,
+    "cancellationHours": 2,
+    "workingHours": {
+      "sun": { "open": true, "start": "10:00", "end": "20:00" },
+      "mon": { "open": true, "start": "10:00", "end": "20:00" },
+      "tue": { "open": true, "start": "10:00", "end": "20:00" },
+      "wed": { "open": true, "start": "10:00", "end": "20:00" },
+      "thu": { "open": true, "start": "10:00", "end": "20:00" },
+      "fri": { "open": true, "start": "10:00", "end": "20:00" },
+      "sat": { "open": true, "start": "10:00", "end": "20:00" }
+    },
+    "breaks": [
+      { "id": "brk-lunch", "label": "Lunch Break", "start": "13:00", "end": "14:00" }
+    ],
+    "services": [
+      { "id": "svc-classic", "name": "Classic Cut", "price": 120, "duration": 30, "active": true },
+      { "id": "svc-beard", "name": "Beard Trim", "price": 90, "duration": 25, "active": true },
+      { "id": "svc-combo", "name": "Hair + Beard", "price": 200, "duration": 40, "active": true }
+    ],
+    "onboarded": true
+  },
+  {
+    "id": "shop-grooming",
+    "name": "The Grooming Lounge",
+    "shopType": "salon",
+    "phone": "+91 98765 10003",
+    "address": "8 Park Avenue, Coimbatore",
+    "description": "Premium grooming lounge for the modern man. Book a ritual, skip the queue.",
+    "location": "Coimbatore",
+    "area": "Gandhipuram",
+    "status": "open",
+    "capacity": 2,
+    "bookingWindow": 30,
+    "cancellationHours": 2,
+    "workingHours": {
+      "sun": { "open": true, "start": "09:00", "end": "22:00" },
+      "mon": { "open": true, "start": "09:00", "end": "22:00" },
+      "tue": { "open": true, "start": "09:00", "end": "22:00" },
+      "wed": { "open": true, "start": "09:00", "end": "22:00" },
+      "thu": { "open": true, "start": "09:00", "end": "22:00" },
+      "fri": { "open": true, "start": "09:00", "end": "22:00" },
+      "sat": { "open": true, "start": "09:00", "end": "22:00" }
+    },
+    "breaks": [
+      { "id": "brk-lunch", "label": "Lunch Break", "start": "13:00", "end": "14:30" },
+      { "id": "brk-tea", "label": "Tea Break", "start": "17:00", "end": "17:30" }
+    ],
+    "services": [
+      { "id": "svc-classic", "name": "Classic Cut", "price": 160, "duration": 30, "active": true },
+      { "id": "svc-beard", "name": "Beard Trim", "price": 120, "duration": 25, "active": true },
+      { "id": "svc-royal", "name": "Royal Shave", "price": 180, "duration": 30, "active": true },
+      { "id": "svc-colour", "name": "Hair Colour", "price": 500, "duration": 60, "active": true }
+    ],
+    "onboarded": true
+  }
+]

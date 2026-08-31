@@ -1,0 +1,76 @@
+<section class="page-head row admin-head">
+  <div>
+    <p class="eyebrow">Admin / Barbers</p>
+    <h1>Manage barbers</h1>
+  </div>
+  <button class="btn btn-primary ripple" id="add-barber-btn" type="button">+ Add barber</button>
+</section>
+
+<section class="section">
+  <div class="card-grid staff-grid admin-staff-grid" id="staff-grid" aria-live="polite"></div>
+</section>
+
+<div class="modal-backdrop" id="barber-modal" hidden>
+  <div class="modal glass" role="dialog" aria-modal="true" aria-labelledby="barber-modal-title">
+    <div class="modal-head">
+      <h2 id="barber-modal-title">Add barber</h2>
+      <button class="icon-btn modal-close" type="button" data-close="barber-modal" aria-label="Close">&#10005;</button>
+    </div>
+    <form id="barber-form" novalidate>
+      <div class="field-row">
+        <div class="field">
+          <label for="bb-name">Name</label>
+          <input id="bb-name" type="text" required />
+        </div>
+        <div class="field">
+          <label for="bb-role">Role</label>
+          <input id="bb-role" type="text" placeholder="Master Barber" />
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="bb-years">Years</label>
+          <input id="bb-years" type="number" min="0" max="60" />
+        </div>
+        <div class="field">
+          <label for="bb-emoji">Avatar emoji</label>
+          <input id="bb-emoji" type="text" maxlength="4" placeholder="&#128104;" />
+        </div>
+        <div class="field">
+          <label for="bb-color">Accent color</label>
+          <input id="bb-color" type="color" value="#7c5cff" />
+        </div>
+      </div>
+      <div class="field">
+        <label for="bb-specialty">Specialty</label>
+        <input id="bb-specialty" type="text" placeholder="Skin fades, classic cuts" />
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="bb-start">Open hour</label>
+          <input id="bb-start" type="time" value="09:30" />
+        </div>
+        <div class="field">
+          <label for="bb-end">Close hour</label>
+          <input id="bb-end" type="time" value="20:30" />
+        </div>
+      </div>
+      <fieldset class="field">
+        <legend>Working days</legend>
+        <div class="day-chips" id="bb-days">
+          <label><input type="checkbox" value="1" checked /> Mon</label>
+          <label><input type="checkbox" value="2" checked /> Tue</label>
+          <label><input type="checkbox" value="3" checked /> Wed</label>
+          <label><input type="checkbox" value="4" checked /> Thu</label>
+          <label><input type="checkbox" value="5" checked /> Fri</label>
+          <label><input type="checkbox" value="6" checked /> Sat</label>
+          <label><input type="checkbox" value="0" /> Sun</label>
+        </div>
+      </fieldset>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" type="button" data-close="barber-modal">Cancel</button>
+        <button class="btn btn-primary" type="submit">Save</button>
+      </div>
+    </form>
+  </div>
+</div>

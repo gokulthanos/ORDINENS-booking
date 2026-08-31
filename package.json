@@ -1,0 +1,17 @@
+{
+  "name": "pentane-barber-booking",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Ordinens Tech - slot booking web app (Vite + vanilla JS)",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "verify": "npm run build && node scripts/verify.mjs"
+  },
+  "devDependencies": {
+    "puppeteer-core": "^23.11.1",
+    "vite": "^5.4.11"
+  }
+}

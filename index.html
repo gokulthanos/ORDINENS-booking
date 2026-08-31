@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Ordinens Tech — book a barber, choose your shop, service and preferred time. Coimbatore." />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta property="og:title" content="Ordinens Tech" />
+    <meta property="og:description" content="Skip the wait. Book your barber and slot online." />
+    <title>Ordinens Tech</title>
+    <style>
+      html,
+      body {
+        background: #ffffff;
+      }
+      #splash {
+        position: fixed;
+        inset: 0;
+        z-index: 100;
+        background: #ffffff;
+        display: grid;
+        place-items: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="splash" class="splash" role="status" aria-label="Loading Ordinens Tech">
+      <div class="splash-stage">
+        <div class="splash-id">
+          <img id="splash-mark" class="splash-mark" alt="Ordinens Tech" width="1536" height="1024" />
+          <div class="splash-word" id="splash-word">ORDINENS TECH</div>
+        </div>
+        <div class="splash-brand-block" id="splash-brand-block">
+          <img id="splash-brand" class="splash-brand" alt="Ordinens Tech" width="1254" height="1254" />
+          <div class="splash-powered" id="splash-powered">
+            <span>Booking powered by</span>
+            <strong>ORDINENS TECH</strong>
+          </div>
+          <div class="splash-progress" id="splash-progress" aria-hidden="true"><i></i></div>
+          <div class="splash-preparing" id="splash-preparing">Preparing your experience…</div>
+        </div>
+      </div>
+    </div>
+
+    <header class="site-header" id="site-header">
+      <div class="header-brand">
+        <span class="brand-mark">O</span>
+        <span class="brand-name">ORDINENS TECH</span>
+      </div>
+      <div class="header-location">
+        <span class="location-city">Coimbatore</span>
+      </div>
+      <div class="header-actions">
+        <span class="header-greeting" id="header-greeting">Hello</span>
+        <a class="btn btn-ghost btn-sm" href="#profile" id="header-profile">
+          <span class="profile-avatar" aria-hidden="true"></span>
+          <span>Profile</span>
+        </a>
+      </div>
+    </header>
+
+    <nav class="bottom-nav" aria-label="Primary">
+      <a href="#home" data-route="home">
+        <span class="nav-label">Home</span>
+      </a>
+      <a href="#bookings" data-route="bookings">
+        <span class="nav-label">Bookings</span>
+      </a>
+      <a href="#profile" data-route="profile">
+        <span class="nav-label">Profile</span>
+      </a>
+    </nav>
+
+    <main id="app" class="page" tabindex="-1"></main>
+
+    <div class="loader" id="loader" aria-hidden="true" hidden>
+      <div class="spinner"></div>
+    </div>
+
+    <div class="toast-wrap" id="toast-wrap" aria-live="polite"></div>
+
+    <script type="module" src="/src/app.js"></script>
+  </body>
+</html>

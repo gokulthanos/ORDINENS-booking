@@ -1,0 +1,64 @@
+<section class="page-head row admin-head">
+  <div>
+    <p class="eyebrow">Admin / Services</p>
+    <h1>Manage services</h1>
+  </div>
+  <button class="btn btn-primary ripple" id="add-service-btn" type="button">+ Add service</button>
+</section>
+
+<section class="section">
+  <div class="card glass panel">
+    <div class="table-wrap">
+      <table class="data-table" id="services-table">
+        <caption class="visually-hidden">List of salon services</caption>
+        <thead>
+          <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Duration</th>
+            <th scope="col">Price</th>
+            <th scope="col">Active</th>
+            <th scope="col">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="services-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<div class="modal-backdrop" id="service-modal" hidden>
+  <div class="modal glass" role="dialog" aria-modal="true" aria-labelledby="service-modal-title">
+    <div class="modal-head">
+      <h2 id="service-modal-title">Add service</h2>
+      <button class="icon-btn modal-close" type="button" data-close="service-modal" aria-label="Close">&#10005;</button>
+    </div>
+    <form id="service-form" novalidate>
+      <div class="field">
+        <label for="sv-name">Name</label>
+        <input id="sv-name" type="text" required />
+      </div>
+      <div class="field">
+        <label for="sv-emoji">Emoji / icon</label>
+        <input id="sv-emoji" type="text" maxlength="4" placeholder="&#9995;" />
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="sv-duration">Duration (min)</label>
+          <input id="sv-duration" type="number" min="10" max="240" step="5" required />
+        </div>
+        <div class="field">
+          <label for="sv-price">Price (&#8377;)</label>
+          <input id="sv-price" type="number" min="0" step="10" required />
+        </div>
+      </div>
+      <div class="field">
+        <label for="sv-desc">Description</label>
+        <textarea id="sv-desc" rows="3"></textarea>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" type="button" data-close="service-modal">Cancel</button>
+        <button class="btn btn-primary" type="submit">Save</button>
+      </div>
+    </form>
+  </div>
+</div>

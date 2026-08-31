@@ -1,0 +1,56 @@
+[
+  {
+    "id": "svc-classic",
+    "name": "Classic Haircut",
+    "emoji": "✂",
+    "duration": 30,
+    "price": 150,
+    "description": "Precision scissor & clipper cut finished with a sharp line-up.",
+    "active": true
+  },
+  {
+    "id": "svc-beard",
+    "name": "Beard Trim & Shave",
+    "emoji": "✌",
+    "duration": 25,
+    "price": 100,
+    "description": "Shape, trim and hot-towel smooth shave with premium balm.",
+    "active": true
+  },
+  {
+    "id": "svc-combo",
+    "name": "Hair + Beard Combo",
+    "emoji": "⭐",
+    "duration": 50,
+    "price": 240,
+    "description": "The full refresh: classic haircut plus beard sculpt.",
+    "active": true
+  },
+  {
+    "id": "svc-fade",
+    "name": "Skin Fade & Design",
+    "emoji": "⚒",
+    "duration": 30,
+    "price": 200,
+    "description": "Sharp zero-fade blending with optional razor line design.",
+    "active": true
+  },
+  {
+    "id": "svc-royal",
+    "name": "Royal Hot-Towel Shave",
+    "emoji": "🧿",
+    "duration": 30,
+    "price": 180,
+    "description": "Layered hot towels, straight-razor shave and a cooling balm.",
+    "active": true
+  },
+  {
+    "id": "svc-kids",
+    "name": "Kids Haircut",
+    "emoji": "🧒",
+    "duration": 20,
+    "price": 120,
+    "description": "Patient, friendly styling for the little ones.",
+    "active": true
+  }
+]
