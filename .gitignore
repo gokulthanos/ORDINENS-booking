@@ -9,6 +9,11 @@ dist/
 .DS_Store
 Thumbs.db
 
+# Environment variables
+.env
+.env.local
+.env.*.local
+
 # Local scratch / debug scripts
 anim_probe.mjs
 check_splash.mjs

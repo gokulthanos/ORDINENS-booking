@@ -3,7 +3,6 @@
    ============================================================= */
 import { getShopConfig, patchShopConfig } from '../data.js';
 import { toast } from '../utils.js';
-import { OWNER_PASSWORD } from '../auth.js';
 
 export default function mount(app) {
   const cfg = getShopConfig();
@@ -35,17 +34,6 @@ export default function mount(app) {
             </select>
             <p class="ow-hint">Deadline for free cancellations.</p>
           </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="ow-settings-section">
-      <div class="ow-settings-section-header">Security</div>
-      <div class="ow-settings-section-body">
-        <div class="ow-form-group">
-          <label class="ow-label">Owner Password</label>
-          <input class="ow-input" type="password" value="${OWNER_PASSWORD}" disabled />
-          <p class="ow-hint">Password cannot be changed in this demo version.</p>
         </div>
       </div>
     </div>

@@ -1,8 +1,8 @@
 /* =============================================================
    Owner App — Shop Settings Page
    ============================================================= */
-import { getShopConfig, patchShopConfig, getHolidays, addHoliday, removeHoliday } from '../data.js';
-import { escapeHtml, toast, getDayName, getDayShort, uid, formatDateShort } from '../utils.js';
+import { getShopConfig, patchShopConfig } from '../data.js';
+import { escapeHtml, toast, getDayName, getDayShort, uid } from '../utils.js';
 
 const DAY_NAMES = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
 
@@ -12,14 +12,13 @@ export default function mount(app) {
 
 function render(app) {
   const cfg = getShopConfig();
-  const holidays = getHolidays();
   const days = [0,1,2,3,4,5,6];
 
   app.innerHTML = `
     <div class="ow-page-header">
       <div>
         <h1 class="ow-page-title">Shop Settings</h1>
-        <p class="ow-page-sub">Manage profile, hours, breaks and holidays</p>
+        <p class="ow-page-sub">Manage profile, hours and breaks</p>
       </div>
       <button class="ow-btn ow-btn-primary ripple" type="button" id="shop-save-btn">Save Changes</button>
     </div>
@@ -90,49 +89,6 @@ function render(app) {
       </div>
       <div class="ow-settings-section-body" style="padding:0;">
         <div id="brk-list-wrap"></div>
-      </div>
-    </div>
-
-    <div class="ow-settings-section">
-      <div class="ow-settings-section-header ow-flex-between">
-        <span>Holidays & Closures</span>
-        <button class="ow-btn ow-btn-secondary ow-btn-sm" type="button" id="add-hol-btn">+ Add Holiday</button>
-      </div>
-      <div class="ow-settings-section-body" style="padding:0;">
-        ${holidays.length ? holidays.map(h => `
-          <div class="ow-break-row" style="padding:12px 18px;">
-            <div style="flex:1;">
-              <div style="font-weight:600; font-size:0.9rem;">${escapeHtml(h.label)}</div>
-              <div style="font-size:0.75rem; color:var(--text-muted);">${formatDateShort(new Date(h.dateISO))}</div>
-            </div>
-            <button class="ow-btn ow-btn-ghost ow-btn-icon" data-del-hol="${h.id}" type="button">✕</button>
-          </div>
-        `).join('') : `
-          <div class="ow-empty" style="padding:30px;">
-            <div style="color:var(--text-muted); font-size:0.85rem;">No upcoming holidays.</div>
-          </div>
-        `}
-      </div>
-    </div>
-
-    <!-- Holiday Modal -->
-    <div id="hol-modal" class="ow-modal-backdrop" hidden>
-      <div class="ow-modal" role="dialog" style="max-width:400px;">
-        <div class="ow-modal-header">
-          <h2 class="ow-modal-title">Add Holiday</h2>
-          <button class="ow-modal-close" type="button" id="hol-modal-close">✕</button>
-        </div>
-        <form id="hol-form">
-          <div class="ow-form-group">
-            <label class="ow-label" for="hol-date">Date</label>
-            <input id="hol-date" class="ow-input" type="date" required />
-          </div>
-          <div class="ow-form-group">
-            <label class="ow-label" for="hol-label">Reason / Label</label>
-            <input id="hol-label" class="ow-input" type="text" placeholder="e.g. Public Holiday" required />
-          </div>
-          <button class="ow-btn ow-btn-primary ow-btn-block" type="submit" style="margin-top:16px;">Save Holiday</button>
-        </form>
       </div>
     </div>
   `;
@@ -213,29 +169,5 @@ function render(app) {
     });
 
     toast('Shop settings saved successfully');
-  });
-
-  // Holidays
-  const holModal = document.getElementById('hol-modal');
-  document.getElementById('add-hol-btn').addEventListener('click', () => holModal.hidden = false);
-  document.getElementById('hol-modal-close').addEventListener('click', () => holModal.hidden = true);
-  document.getElementById('hol-form').addEventListener('submit', e => {
-    e.preventDefault();
-    const date = document.getElementById('hol-date').value;
-    const label = document.getElementById('hol-label').value.trim();
-    if (date && label) {
-      addHoliday(date, label);
-      toast('Holiday added');
-      render(app);
-    }
-  });
-
-  app.addEventListener('click', e => {
-    const delHol = e.target.closest('[data-del-hol]');
-    if (delHol) {
-      removeHoliday(delHol.dataset.delHol);
-      toast('Holiday removed');
-      render(app);
-    }
   });
 }

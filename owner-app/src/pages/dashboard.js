@@ -15,14 +15,6 @@ export default function mount(app) {
   }
 
   render(app);
-
-  const sidebarLogout = document.getElementById('sidebar-logout');
-  sidebarLogout?.addEventListener('click', () => {
-    import('../auth.js').then(m => {
-      m.ownerLogout();
-      location.hash = '#login';
-    });
-  });
 }
 
 function render(app) {

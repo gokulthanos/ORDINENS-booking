@@ -3,11 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Ordinens Tech — Shop Owner Management Panel. Manage bookings, services, barbers and shop settings." />
+    <meta name="description" content="Ordinens Tech — Shop Owner Management Panel. Manage bookings, services, holidays and shop settings." />
     <meta name="theme-color" content="#ffffff" />
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
     <meta property="og:title" content="Ordinens Tech — Owner App" />
-    <meta property="og:description" content="Manage your shop, bookings and team." />
+    <meta property="og:description" content="Manage your shop, bookings and settings." />
     <title>Ordinens Tech — Owner App</title>
   </head>
   <body>
@@ -47,9 +47,9 @@
             <span class="nav-icon" aria-hidden="true">✂</span>
             Services
           </a>
-          <a href="#barbers" data-ow-route="barbers">
-            <span class="nav-icon" aria-hidden="true">👨</span>
-            Barbers
+          <a href="#holidays" data-ow-route="holidays">
+            <span class="nav-icon" aria-hidden="true">📅</span>
+            Holidays
           </a>
           <a href="#shop" data-ow-route="shop">
             <span class="nav-icon" aria-hidden="true">🏪</span>
@@ -66,9 +66,9 @@
             <span class="nav-icon" aria-hidden="true">⚙</span>
             Settings
           </a>
-          <button id="sidebar-logout" type="button">
-            <span class="nav-icon" aria-hidden="true">🚪</span>
-            Sign Out
+          <button type="button" id="sidebar-logout">
+            <span class="nav-icon" aria-hidden="true">⎋</span>
+            Logout
           </button>
         </div>
       </aside>
@@ -106,9 +106,9 @@
     <!-- More drawer (mobile) -->
     <div id="ow-more-drawer" role="dialog" aria-label="More navigation" aria-hidden="true">
       <div class="ow-drawer-grid">
-        <a href="#barbers" data-ow-route="barbers" class="ow-drawer-item">
-          <span class="nav-icon" aria-hidden="true">👨</span>
-          Barbers
+        <a href="#holidays" data-ow-route="holidays" class="ow-drawer-item">
+          <span class="nav-icon" aria-hidden="true">📅</span>
+          Holidays
         </a>
         <a href="#shop" data-ow-route="shop" class="ow-drawer-item">
           <span class="nav-icon" aria-hidden="true">🏪</span>

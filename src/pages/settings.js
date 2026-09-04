@@ -1,12 +1,8 @@
-import { currentUser, requiresLogin } from '../auth.js';
+import { currentUser } from '../auth.js';
 import { escapeHtml } from '../utils.js';
 
 export default function mountSettings(root) {
   const user = currentUser();
-  if (requiresLogin() && !user) {
-    location.hash = '#login';
-    return;
-  }
   const personal = document.getElementById('settings-personal');
   if (personal && user) {
     personal.innerHTML = `

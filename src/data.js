@@ -159,10 +159,18 @@ function normalizeShop(shop) {
 }
 
 /**
+ * Whether a given date is a holiday (set by the owner via ow_holidays).
+ */
+export function isHoliday(dateISO) {
+  return readJSON(STORAGE_KEYS.holidays, []).some(h => h.dateISO === dateISO);
+}
+
+/**
  * Whether a shop is open on a given date (by its configured working day).
  */
 export function shopOpenOn(shop, dateISO) {
   if (!shop) return false;
+  if (isHoliday(dateISO)) return false;
   const day = fromISO(dateISO).getDay();
   const dayKey = DAY_NAMES[day];
   const dayCfg = (shop.workingHours || {})[dayKey] || (shop.workingHours || {})[String(day)];

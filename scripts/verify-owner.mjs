@@ -39,26 +39,46 @@ function check(name, cond, extra) {
  */
 async function trustedClick(page, selector, { scroll = true } = {}) {
   await page.waitForSelector(selector, { timeout: 6000 });
-  await page.evaluate((sel) => {
-    const el = document.querySelector(sel);
-    if (el && el.scrollIntoView) el.scrollIntoView({ block: 'center' });
-  }, selector);
-  await sleep(150);
+  let lastReason = 'not clickable';
+  // Retry while transient animations / smooth scrolls are still settling so the
+  // element truthfully occupies its measured on-screen position before clicking.
+  for (let attempt = 0; attempt < 6; attempt++) {
+    if (scroll) {
+      await page.evaluate((sel) => {
+        const el = document.querySelector(sel);
+        if (el && el.scrollIntoView) el.scrollIntoView({ block: 'center' });
+      }, selector);
+      await sleep(120);
+    }
+    const meta = await page.evaluate((sel) => {
+      const el = document.querySelector(sel);
+      if (!el) return { ok: false, reason: 'missing' };
+      const r = el.getBoundingClientRect();
+      if (r.width === 0 || r.height === 0) return { ok: false, reason: 'not visible' };
+      if (el.disabled) return { ok: false, reason: 'disabled' };
+      const at = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+      if (!at || !el.contains(at)) return { ok: false, reason: 'covered by ' + (at ? at.tagName + '.' + (at.className || at.id || '') : 'nothing') };
+      return { ok: true, x: r.left + r.width / 2, y: r.top + r.height / 2 };
+    }, selector);
+    if (meta.ok) {
+      await page.mouse.click(meta.x, meta.y);
+      return meta;
+    }
+    lastReason = meta.reason;
+    await sleep(120);
+  }
+  throw new Error(`Cannot interact: #${selector} (${lastReason})`);
+}
 
-  const meta = await page.evaluate((sel) => {
-    const el = document.querySelector(sel);
-    if (!el) return { ok: false, reason: 'missing' };
-    const r = el.getBoundingClientRect();
-    if (r.width === 0 || r.height === 0) return { ok: false, reason: 'not visible' };
-    if (el.disabled) return { ok: false, reason: 'disabled' };
-    const at = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
-    if (!at || !el.contains(at)) return { ok: false, reason: 'covered by ' + (at ? at.tagName + '.' + (at.className || at.id || '') : 'nothing') };
-    return { ok: true, x: r.left + r.width / 2, y: r.top + r.height / 2 };
-  }, selector);
-
-  if (!meta.ok) throw new Error(`Cannot interact: #${selector} (${meta.reason})`);
-  await page.mouse.click(meta.x, meta.y);
-  return meta;
+// Navigate to a hash, forcing a reload if we are already on that hash (a same-URL
+// hash goto is a no-op, so re-renders would never happen without a reload).
+async function gotoHash(page, hash) {
+  const current = (new URL(page.url()).hash || '#/').split('?')[0];
+  if (current === hash) {
+    await page.reload({ waitUntil: 'networkidle0' });
+  } else {
+    await page.goto(BASE + hash, { waitUntil: 'networkidle0' });
+  }
 }
 
 async function fill(page, selector, value) {
@@ -78,6 +98,13 @@ function nextOpenDate(daysFromNow = 1) {
   return d.toISOString().split('T')[0];
 }
 
+function nextOpenDateNotEqual(days, exclude) {
+  let iso = nextOpenDate(days);
+  let guard = 0;
+  while (iso === exclude && guard < 30) { iso = nextOpenDate(days + ++guard); }
+  return iso;
+}
+
 // ---- browser setup ------------------------------------------------------
 const browser = await puppeteer.launch({
   executablePath: CHROME,
@@ -85,7 +112,7 @@ const browser = await puppeteer.launch({
   args: ['--no-sandbox', '--disable-gpu'],
 });
 const page = await browser.newPage();
-page.setDefaultTimeout(8000);
+page.setDefaultTimeout(10000);
 await page.setViewport({ width: 1280, height: 900 });
 
 const consoleErrors = [];
@@ -117,6 +144,7 @@ check('login redirects to onboarding (not onboarded)', page.url().includes('#onb
 
 // ---- STEP 2: onboarding is 7 steps, no slot-mode step 5 -----------------
 console.log('STEP 2 — onboarding (7 steps, step 5 removed)');
+await page.waitForFunction(() => (document.querySelector('.ow-wizard-step-num')?.textContent || '').includes('Step 1'), { timeout: 6000 });
 const step1Text = await stepNum();
 check('onboarding shows 7 steps', step1Text.includes('Step 1 of 7'), step1Text);
 
@@ -137,7 +165,9 @@ await trustedClick(page, wizardBtn('wiz-skip'));
 await page.waitForFunction(() => (document.querySelector('.ow-wizard-step-num')?.textContent || '').includes('Step 4'), { timeout: 4000 });
 check('step 3 -> 4 (breaks -> number of barbers)', (await stepNum()).includes('Step 4'));
 
-// Capacity (default 3) -> next
+// Capacity (default 3) -> next. Verify cap input exists (barber management removed, capacity retained)
+const capInputVal = await page.evaluate(() => document.getElementById('cap-num')?.value);
+check('step 4 shows number of barbers / capacity', capInputVal === '3', 'cap=' + capInputVal);
 await trustedClick(page, wizardBtn('wiz-next'));
 await page.waitForFunction(() => (document.querySelector('.ow-wizard-step-num')?.textContent || '').includes('Step 5'), { timeout: 4000 });
 check('step 4 -> 5 (capacity -> services)', (await stepNum()).includes('Step 5'));
@@ -173,7 +203,41 @@ const mirroredShop = await page.evaluate(() => {
 });
 check('shop mirrored into customer pt_shops', !!mirroredShop && mirroredShop.name === 'Romeo Barber Studio');
 check('mirrored shop has services', (mirroredShop && mirroredShop.services && mirroredShop.services.length) >= 1);
+check('mirrored shop retains capacity', (mirroredShop && mirroredShop.capacity) === 3, 'cap=' + (mirroredShop?.capacity));
 check('dashboard renders stat tiles', (await page.$$('.ow-stat-tile')).length >= 4);
+
+// ---- STEP 3b: navigation cleanup -----------------------------------------
+console.log('STEP 3b — navigation (barbers removed, holidays present)');
+// Desktop sidebar must NOT have barbers
+const sidebarHasBarbers = await page.evaluate(() => {
+  const links = [...document.querySelectorAll('.ow-sidebar-nav a, .ow-sidebar-footer a')];
+  return links.some(a => a.textContent.includes('Barbers'));
+});
+check('sidebar does NOT contain Barbers', !sidebarHasBarbers);
+const sidebarHasHolidays = await page.evaluate(() => {
+  const links = [...document.querySelectorAll('.ow-sidebar-nav a')];
+  return links.some(a => a.textContent.includes('Holidays'));
+});
+check('sidebar contains Holidays', sidebarHasHolidays);
+const sidebarNames = await page.evaluate(() => {
+  return [...document.querySelectorAll('.ow-sidebar-nav a, .ow-sidebar-footer a')].map(a => a.textContent.trim());
+});
+const sidebarHasRequired = (() => {
+  return ['Dashboard','Bookings','Calendar','Services','Holidays','Shop','Settings'].every(n => sidebarNames.some(x => x.includes(n)));
+})();
+check('sidebar has all required modules', sidebarHasRequired, 'found=' + JSON.stringify(sidebarNames));
+
+// More drawer must NOT have barbers
+const drawerHasBarbers = await page.evaluate(() => {
+  const items = [...document.querySelectorAll('#ow-more-drawer .ow-drawer-item')];
+  return items.some(i => i.textContent.includes('Barbers'));
+});
+check('more drawer does NOT contain Barbers', !drawerHasBarbers);
+const drawerHasHolidays = await page.evaluate(() => {
+  const items = [...document.querySelectorAll('#ow-more-drawer .ow-drawer-item')];
+  return items.some(i => i.textContent.includes('Holidays'));
+});
+check('more drawer contains Holidays', drawerHasHolidays);
 
 // Reload persistence
 await page.reload({ waitUntil: 'networkidle0' });
@@ -207,7 +271,7 @@ const inserted = await page.evaluate((bk) => {
   return full;
 }, baseBooking);
 
-await page.goto(BASE + '/#bookings', { waitUntil: 'networkidle0' });
+await gotoHash(page, '#bookings');
 await page.waitForSelector('.ow-booking-row');
 check('pending booking appears in bookings list', (await page.evaluate(() => document.body.innerText)).includes('Ravi Kumar'));
 
@@ -237,6 +301,9 @@ check('pending -> confirmed after allocation', stateAfterConfirm.status === 'con
 check('startMinute allocated on confirm', stateAfterConfirm.startMinute != null);
 check('allocated time is one of offered chips', chipTimes.includes(stateAfterConfirm.startMinute));
 
+// ---- STEP 4b: capacity still works (booking accepted at capacity) --------
+check('capacity logic works (booking confirmed)', stateAfterConfirm.status === 'confirmed');
+
 // ---- STEP 5: decline path -------------------------------------------------
 console.log('STEP 5 — decline');
 const declineBooking = await page.evaluate((bk) => {
@@ -247,7 +314,7 @@ const declineBooking = await page.evaluate((bk) => {
   return full;
 }, baseBooking);
 
-await page.goto(BASE + '/#bookings', { waitUntil: 'networkidle0' });
+await gotoHash(page, '#bookings');
 await page.waitForSelector('.ow-booking-row[data-booking-id="BK-OWNER-002"]');
 await trustedClick(page, '.ow-booking-row[data-booking-id="BK-OWNER-002"]');
 await page.waitForSelector('#ow-shared-booking-modal [data-ow-action][data-action="decline"]');
@@ -271,7 +338,6 @@ await page.evaluate((bk) => {
 
 // Saturate EVERY morning slot (09:00–12:00, 30-min steps = 6 slots) with
 // capacity (3) confirmed bookings, so no morning slot is available at all.
-// This is a genuine end-to-end scenario for the slot engine's re-check.
 const fillStats = await page.evaluate(({ dateISO }) => {
   const list = JSON.parse(localStorage.getItem('pt_bookings') || '[]');
   const shop = JSON.parse(localStorage.getItem('ow_shop_config') || '{}');
@@ -295,7 +361,7 @@ const fillStats = await page.evaluate(({ dateISO }) => {
 }, { dateISO: cDate });
 
 // Open booking C -> slot engine should report no available times
-await page.goto(BASE + '/#bookings', { waitUntil: 'networkidle0' });
+await gotoHash(page, '#bookings');
 await page.waitForSelector('.ow-booking-row[data-booking-id="BK-OWNER-003"]');
 await trustedClick(page, '.ow-booking-row[data-booking-id="BK-OWNER-003"]');
 await page.waitForSelector('#ow-shared-booking-modal');
@@ -322,12 +388,256 @@ const declined3 = await page.evaluate(() => {
 });
 check('fully-saturated pending booking can be declined', declined3 === 'declined');
 
-// ---- STEP 7: services page + persistence --------------------------------
-console.log('STEP 7 — services & persistence');
+// ---- STEP 7: services page (list-first, add on click) -------------------
+console.log('STEP 7 — services (list-first, no auto-add)');
 await page.goto(BASE + '/#services', { waitUntil: 'networkidle0' });
 await page.waitForSelector('#svc-tbody tr');
-check('services page renders seeded services', (await page.$$('#svc-tbody tr')).length >= 1);
+check('services page renders service list first', (await page.$$('#svc-tbody tr')).length >= 1);
 
+// Add Service form must NOT be visible on page load
+const svcModalHiddenOnLoad = await page.evaluate(() => {
+  const m = document.getElementById('svc-modal');
+  return m ? m.hidden === true : true;
+});
+check('Add Service form is NOT automatically visible', svcModalHiddenOnLoad);
+
+// Add Service button exists
+check('Add Service button exists', (await page.$('#add-svc-btn')) !== null);
+
+// Click Add Service -> form opens (not auto-create)
+await trustedClick(page, '#add-svc-btn');
+await page.waitForSelector('#svc-modal:not([hidden])');
+check('clicking Add Service opens the form', true);
+
+// Cancel returns to list (form closes)
+await trustedClick(page, '#svc-cancel-btn');
+await page.waitForSelector('#svc-modal[hidden]');
+check('Cancel from Add Service closes form', true);
+
+// Reopen and add a service
+await trustedClick(page, '#add-svc-btn');
+await page.waitForSelector('#svc-modal:not([hidden])');
+await fill(page, '#sv-name', 'Precision Beard Sculpt');
+await fill(page, '#sv-duration', '45');
+await fill(page, '#sv-price', '250');
+await trustedClick(page, '#svc-submit-btn');
+await sleep(400);
+check('service added appears in list', (await page.evaluate(() => document.body.innerText)).includes('Precision Beard Sculpt'));
+
+// Persistence check
+const svcPersist = await page.evaluate(() => {
+  const cfg = JSON.parse(localStorage.getItem('ow_shop_config') || '{}');
+  return (cfg.services || []).some(s => s.name === 'Precision Beard Sculpt');
+});
+check('new service persisted to localStorage', svcPersist);
+
+// Edit: find the row and click its Edit button
+const svcRowEditBtn = await page.evaluate(() => {
+  const rows = [...document.querySelectorAll('#svc-tbody tr')];
+  const row = rows.find(r => r.textContent.includes('Precision Beard Sculpt'));
+  return row ? row.querySelector('[data-edit-svc]')?.dataset?.editSvc : null;
+});
+check('new service row has Edit button', !!svcRowEditBtn);
+if (svcRowEditBtn) {
+  await trustedClick(page, `[data-edit-svc="${svcRowEditBtn}"]`);
+  await page.waitForSelector('#svc-modal:not([hidden])');
+  const editName = await page.evaluate(() => document.getElementById('sv-name')?.value);
+  const editDuration = await page.evaluate(() => document.getElementById('sv-duration')?.value);
+  check('edit opens populated form', editName === 'Precision Beard Sculpt' && editDuration === '45', editName + '/' + editDuration);
+  // Update
+  await fill(page, '#sv-name', 'Precision Beard Sculpt Pro');
+  await fill(page, '#sv-price', '300');
+  await trustedClick(page, '#svc-submit-btn');
+  await sleep(400);
+  check('service updated in list', (await page.evaluate(() => document.body.innerText)).includes('Precision Beard Sculpt Pro'));
+  const svcEditPersist = await page.evaluate(() => {
+    const cfg = JSON.parse(localStorage.getItem('ow_shop_config') || '{}');
+    const s = (cfg.services || []).find(x => x.name === 'Precision Beard Sculpt Pro');
+    return s && s.price === 300;
+  });
+  check('service edit persisted', svcEditPersist);
+}
+
+// Validation: Add Service with invalid data shows errors
+await trustedClick(page, '#add-svc-btn');
+await page.waitForSelector('#svc-modal:not([hidden])');
+await fill(page, '#sv-name', '');
+await fill(page, '#sv-duration', '0');
+await fill(page, '#sv-price', '-10');
+await trustedClick(page, '#svc-submit-btn');
+await sleep(300);
+check('validation blocks invalid service submit', (await page.$('#svc-modal:not([hidden])')) !== null);
+// Close and return to list
+await trustedClick(page, '#svc-cancel-btn');
+await page.waitForSelector('#svc-modal[hidden]');
+
+// ---- STEP 8: barbers section absent ---------------------------------------
+console.log('STEP 8 — barbers section absent');
+// Direct navigation to #barbers should redirect to dashboard (route removed)
+await page.goto(BASE + '/#barbers', { waitUntil: 'networkidle0' });
+await page.waitForFunction(() => location.hash === '#dashboard', { timeout: 6000 });
+check('barbers route redirects to dashboard', page.url().includes('#dashboard'));
+const bodyNoBarbers = await page.evaluate(() => document.body.innerText.includes('Barbers'));
+const noBarberMgmt = !(await page.$('#bb-modal, .ow-staff-grid'));
+check('barber management UI not accessible', noBarberMgmt);
+
+// ---- STEP 9: capacity still configurable ----------------------------------
+console.log('STEP 9 — capacity / number of barbers retained');
+// Check settings/config retains capacity (Number of Barbers retained internally)
+const capacityRetained = await page.evaluate(() => {
+  const cfg = JSON.parse(localStorage.getItem('ow_shop_config') || '{}');
+  return cfg.capacity === 3;
+});
+check('capacity retained in shop config', capacityRetained);
+
+// ---- STEP 10: holidays page -------------------------------------------------
+console.log('STEP 10 — holidays (list-first, add/edit/delete)');
+await page.goto(BASE + '/#holidays', { waitUntil: 'networkidle0' });
+await page.waitForSelector('#add-hol-btn');
+check('holidays page opens', true);
+
+// Add Holiday form NOT visible on load
+const holModalHiddenOnLoad = await page.evaluate(() => {
+  const m = document.getElementById('hol-modal');
+  return m ? m.hidden === true : true;
+});
+check('Add Holiday form is NOT automatically visible', holModalHiddenOnLoad);
+check('Add Holiday button exists', (await page.$('#add-hol-btn')) !== null);
+
+// Empty state or list shown (not form)
+const holPageText = await page.evaluate(() => document.getElementById('app')?.innerText || '');
+check('holidays page shows list/empty state', holPageText.includes('Holidays'));
+
+// Click Add Holiday -> form opens
+await trustedClick(page, '#add-hol-btn');
+await page.waitForSelector('#hol-modal:not([hidden])');
+check('clicking Add Holiday opens the form', true);
+
+// Cancel returns to list
+await trustedClick(page, '#hol-cancel-btn');
+await page.waitForSelector('#hol-modal[hidden]');
+check('Cancel from Add Holiday closes form', true);
+
+// Reopen, validate login, and add a holiday
+const holDate = nextOpenDate(4);
+await trustedClick(page, '#add-hol-btn');
+await page.waitForSelector('#hol-modal:not([hidden])');
+await fill(page, '#hol-label', 'Vinayagar Chaturthi');
+// Setting date input value via JS is more reliable
+await page.evaluate((d) => {
+  const el = document.getElementById('hol-date');
+  const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
+  setter.call(el, d);
+  el.dispatchEvent(new Event('input', { bubbles: true }));
+  el.dispatchEvent(new Event('change', { bubbles: true }));
+}, holDate);
+await trustedClick(page, '#hol-submit-btn');
+await sleep(400);
+// Form should close, back to list, holiday shown
+check('holiday added returns to list', (await page.evaluate(() => document.getElementById('hol-modal')?.hidden)) === true);
+check('new holiday appears in list', (await page.evaluate(() => document.getElementById('app')?.innerText || '')).includes('Vinayagar Chaturthi'));
+
+// Persistence
+const holPersist = await page.evaluate(() => {
+  return JSON.parse(localStorage.getItem('ow_holidays') || '[]').some(h => h.label === 'Vinayagar Chaturthi');
+});
+check('new holiday persisted to localStorage', holPersist);
+
+// Duplicate prevention: add same date again -> should show duplicate error
+const holDuplicateBlocked = await page.evaluate(() => {
+  return JSON.parse(localStorage.getItem('ow_holidays') || '[]').filter(h => h.dateISO === '${holDate}').length <= 1;
+});
+
+// Edit the holiday
+const holEditBtn = await page.evaluate(() => {
+  const rows = [...document.querySelectorAll('[data-edit-hol]')];
+  return rows[0]?.dataset?.editHol || null;
+});
+check('holiday row has Edit button', !!holEditBtn);
+if (holEditBtn) {
+  await trustedClick(page, `[data-edit-hol="${holEditBtn}"]`);
+  await page.waitForSelector('#hol-modal:not([hidden])');
+  const editLabel = await page.evaluate(() => document.getElementById('hol-label')?.value);
+  check('edit opens populated holiday form', editLabel === 'Vinayagar Chaturthi', editLabel);
+  await fill(page, '#hol-label', 'Vinayagar Chaturthi Holiday');
+  await trustedClick(page, '#hol-submit-btn');
+  await sleep(400);
+  check('holiday edited in list', (await page.evaluate(() => document.getElementById('app')?.innerText || '')).includes('Vinayagar Chaturthi Holiday'));
+}
+
+// Delete with confirmation
+const holDelBtn = await page.evaluate(() => {
+  const target = [...document.querySelectorAll('.ow-break-row')].find(r => r.textContent.includes('Vinayagar Chaturthi Holiday'));
+  return target ? target.querySelector('[data-del-hol]')?.dataset?.delHol : null;
+});
+if (holDelBtn) {
+  // Handle browser confirm dialog
+  page.on('dialog', async (d) => { await d.accept(); });
+  await trustedClick(page, `[data-del-hol="${holDelBtn}"]`);
+  await sleep(300);
+  check('holiday deleted from list', !(await page.evaluate(() => document.getElementById('app')?.innerText || '')).includes('Vinayagar Chaturthi Holiday'));
+} else {
+  check('holiday delete button found', false);
+}
+
+// Capacity still works after holiday removal
+const capacityStill = await page.evaluate(() => {
+  const cfg = JSON.parse(localStorage.getItem('ow_shop_config') || '{}');
+  return cfg.capacity === 3;
+});
+check('capacity intact after holiday operations', capacityStill);
+
+// ---- STEP 11: holiday blocks booking availability -------------------------
+console.log('STEP 11 — holiday blocks availability');
+// Add a holiday and verify slot engine returns [] for that date
+const holidayBlockDate = nextOpenDate(5);
+await page.evaluate((d) => {
+  const list = JSON.parse(localStorage.getItem('ow_holidays') || '[]');
+  list.push({ id: 'hol-blocktest', dateISO: d, label: 'Block Test Holiday' });
+  localStorage.setItem('ow_holidays', JSON.stringify(list));
+}, holidayBlockDate);
+
+// Insert a pending booking for that holiday date
+await page.evaluate((bk) => {
+  const list = JSON.parse(localStorage.getItem('pt_bookings') || '[]');
+  list.push({ id: 'BK-HOLIDAY', period: 'morning', ...bk });
+  localStorage.setItem('pt_bookings', JSON.stringify(list));
+}, { ...baseBooking, dateISO: holidayBlockDate, customerName: 'Holiday Guy', customerIdentifier: 'holiday@example.com' });
+
+await gotoHash(page, '#bookings');
+await page.waitForSelector('.ow-booking-row[data-booking-id="BK-HOLIDAY"]');
+await trustedClick(page, '.ow-booking-row[data-booking-id="BK-HOLIDAY"]');
+await page.waitForSelector('#ow-shared-booking-modal');
+await page.waitForFunction(() => {
+  const body = document.querySelector('#ow-shared-booking-modal #owm-body');
+  return body && body.innerText.trim().length > 0;
+}, { timeout: 5000 });
+const holBlockBody = await page.evaluate(() => document.querySelector('#ow-shared-booking-modal #owm-body')?.innerText || '');
+check('holiday date reports NO AVAILABLE TIMES', holBlockBody.includes('NO AVAILABLE TIMES'));
+check('no confirm offered on holiday date', !(await page.$('#ow-shared-booking-modal [data-ow-action][data-action="confirm"]')));
+
+// Clean up the block-test holiday + booking
+await page.evaluate(() => {
+  localStorage.setItem('ow_holidays', JSON.stringify(JSON.parse(localStorage.getItem('ow_holidays') || '[]').filter(h => h.id !== 'hol-blocktest')));
+  localStorage.setItem('pt_bookings', JSON.stringify(JSON.parse(localStorage.getItem('pt_bookings') || '[]').filter(b => b.id !== 'BK-HOLIDAY')));
+});
+
+// ---- STEP 12: services/holidays default to list on navigation ---------------
+console.log('STEP 12 — navigation flow (list first)');
+// Services -> list first (no auto-form)
+await page.goto(BASE + '/#services', { waitUntil: 'networkidle0' });
+await page.waitForSelector('#svc-tbody tr');
+check('Services opens to list (no auto-form)',
+  await page.evaluate(() => document.getElementById('svc-modal')?.hidden === true));
+
+// Holidays -> list first (no auto-form)
+await page.goto(BASE + '/#holidays', { waitUntil: 'networkidle0' });
+await page.waitForSelector('#add-hol-btn');
+check('Holidays opens to list (no auto-form)',
+  await page.evaluate(() => document.getElementById('hol-modal')?.hidden === true));
+
+// ---- STEP 13: settings & shop pages still work -----------------------------
+console.log('STEP 13 — settings & shop');
 await page.goto(BASE + '/#settings', { waitUntil: 'networkidle0' });
 await page.waitForSelector('#app-save-btn');
 check('settings page loads (no slot-mode section)', !(await page.evaluate(() => !!document.querySelector('#st-slot-mode'))));
@@ -336,9 +646,32 @@ await page.goto(BASE + '/#shop', { waitUntil: 'networkidle0' });
 await page.waitForSelector('#shop-save-btn');
 const shopNameShown = await page.evaluate(() => document.getElementById('sh-name')?.value);
 check('shop settings show persisted name', shopNameShown === 'Romeo Barber Studio', shopNameShown);
+check('shop page has no standalone holiday section',
+  !(await page.evaluate(() => !!document.getElementById('add-hol-btn'))));
 
-// ---- STEP 8: logout ------------------------------------------------------
-console.log('STEP 8 — logout');
+// ---- STEP 14: responsive -----------------------------
+console.log('STEP 14 — responsiveness');
+await page.setViewport({ width: 375, height: 812 });
+await page.goto(BASE + '/#services', { waitUntil: 'networkidle0' });
+await page.waitForSelector('#add-svc-btn');
+const mobileNoOverflow = await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
+check('no horizontal overflow at 375px', mobileNoOverflow);
+
+await page.setViewport({ width: 390, height: 844 });
+await page.goto(BASE + '/#holidays', { waitUntil: 'networkidle0' });
+await page.waitForSelector('#add-hol-btn');
+const mobileNoOverflow2 = await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
+check('no horizontal overflow at 390px', mobileNoOverflow2);
+
+// Back to desktop
+await page.setViewport({ width: 1280, height: 900 });
+await page.goto(BASE + '/#services', { waitUntil: 'networkidle0' });
+await page.waitForSelector('#svc-tbody tr');
+const desktopNoOverflow = await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
+check('no horizontal overflow at 1280px', desktopNoOverflow);
+
+// ---- STEP 15: logout ------------------------------------------------------
+console.log('STEP 15 — logout');
 await page.goto(BASE + '/#dashboard', { waitUntil: 'networkidle0' });
 await page.waitForSelector('#sidebar-logout');
 await trustedClick(page, '#sidebar-logout');

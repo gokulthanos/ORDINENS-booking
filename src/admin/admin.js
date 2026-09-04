@@ -1,10 +1,4 @@
 import {
-  adminLogin,
-  adminLogout,
-  isAdmin,
-  ADMIN_PASSWORD,
-} from '../auth.js';
-import {
   getServices,
   saveServices,
   getStaff,
@@ -15,54 +9,13 @@ import {
   formatSlotTime,
 } from '../data.js';
 import { formatINR, formatDateLong, fromISO, escapeHtml, toast } from '../utils.js';
-import { handleRoute } from '../router.js';
 
 export default function mountAdmin() {
-  if (!isAdmin()) {
-    renderGate();
-    return;
-  }
-
   const route = location.hash.replace(/^#\/?/, '').toLowerCase();
   if (route === 'admin') renderDashboard();
   else if (route === 'admin/services') renderServices();
   else if (route === 'admin/staff') renderStaff();
   else if (route === 'admin/bookings') renderBookings();
-}
-
-/* ------------------------------- Gate -------------------------------- */
-function renderGate() {
-  const app = document.getElementById('app');
-  app.innerHTML = `
-    <section class="page-head center">
-      <p class="eyebrow">Restricted area</p>
-      <h1>Admin access</h1>
-      <p class="page-sub">Enter the salon master key to open the dashboard.</p>
-    </section>
-    <section class="section center">
-      <form class="login-card glass" id="admin-gate" novalidate>
-        <div class="field">
-          <label for="admin-pass">Password</label>
-          <input id="admin-pass" type="password" autocomplete="current-password" required />
-        </div>
-        <p class="login-note" id="admin-note" role="alert"></p>
-        <button class="btn btn-primary ripple btn-block" type="submit">Unlock</button>
-        <p class="login-note hint">Demo key: <code>${ADMIN_PASSWORD}</code></p>
-      </form>
-    </section>`;
-
-  const form = document.getElementById('admin-gate');
-  const note = document.getElementById('admin-note');
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
-    if (adminLogin(document.getElementById('admin-pass').value.trim())) {
-      note.textContent = '';
-      toast('Welcome back, boss.');
-      handleRoute();
-    } else {
-      note.textContent = 'Wrong key. Try again.';
-    }
-  });
 }
 
 /* ----------------------------- Dashboard ----------------------------- */
@@ -109,8 +62,6 @@ function renderDashboard() {
     </div>`
     )
     .join('');
-
-  bindLogout();
 }
 
 /* ---------------------------- Services CRUD --------------------------- */
@@ -387,16 +338,6 @@ function statusBadge(booking, updateStatus) {
     <select class="status-select status-${current}" data-status="${booking.id}" aria-label="Change status for ${booking.id}">
       ${options}
     </select>`;
-}
-
-/* ------------------------------ Shared bits --------------------------- */
-function bindLogout() {
-  const btn = document.getElementById('admin-logout');
-  btn?.addEventListener('click', () => {
-    adminLogout();
-    document.dispatchEvent(new CustomEvent('pt:userchange'));
-    location.hash = '#home';
-  });
 }
 
 /* ------------------------------ Helpers ------------------------------- */

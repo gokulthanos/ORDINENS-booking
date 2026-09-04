@@ -2,31 +2,28 @@
    Ordinens Tech — Owner App Router
    Hash-based routing matching the customer-app architecture.
    ============================================================= */
-import { isOwner } from './auth.js';
+import { requiresOwner, isOwner } from './auth.js';
 
 const OWNER_ROUTES = [
-  'login',
   'dashboard',
   'onboarding',
   'bookings',
   'calendar',
   'services',
-  'barbers',
+  'holidays',
   'shop',
   'reviews',
   'settings',
 ];
 
-const PROTECTED = ['dashboard','onboarding','bookings','calendar','services','barbers','shop','reviews','settings'];
-
 const META = {
-  login:       'Sign In — Ordinens Tech Owner',
+  login:       'Login — Ordinens Tech Owner',
   dashboard:   'Dashboard — Ordinens Tech Owner',
   onboarding:  'Shop Setup — Ordinens Tech Owner',
   bookings:    'Bookings — Ordinens Tech Owner',
   calendar:    'Calendar — Ordinens Tech Owner',
   services:    'Services — Ordinens Tech Owner',
-  barbers:     'Barbers — Ordinens Tech Owner',
+  holidays:    'Holidays — Ordinens Tech Owner',
   shop:        'Shop Settings — Ordinens Tech Owner',
   reviews:     'Reviews — Ordinens Tech Owner',
   settings:    'Settings — Ordinens Tech Owner',
@@ -40,7 +37,7 @@ const CONTROLLERS = {
   bookings:   () => import('./pages/bookings.js').then(m => m.default),
   calendar:   () => import('./pages/calendar.js').then(m => m.default),
   services:   () => import('./pages/services.js').then(m => m.default),
-  barbers:    () => import('./pages/barbers.js').then(m => m.default),
+  holidays:   () => import('./pages/holidays.js').then(m => m.default),
   shop:       () => import('./pages/shop.js').then(m => m.default),
   reviews:    () => import('./pages/reviews.js').then(m => m.default),
   settings:   () => import('./pages/settings.js').then(m => m.default),
@@ -49,6 +46,7 @@ const CONTROLLERS = {
 export function getRoute() {
   const raw = location.hash.replace(/^#\/?/, '').toLowerCase();
   if (!raw || raw === '/') return 'dashboard';
+  if (raw === 'login') return 'login';
   if (OWNER_ROUTES.includes(raw)) return raw;
   return 'dashboard';
 }
@@ -59,26 +57,45 @@ export function navigate(hash) {
 
 export async function handleRoute() {
   const route = getRoute();
+
+  // Normalise unknown / removed routes (e.g. #barbers) to the real dashboard URL.
+  const canonical = location.hash.replace(/^#\/?/, '').toLowerCase();
+  if (route === 'dashboard' && canonical !== '' && canonical !== 'dashboard') {
+    location.hash = '#dashboard';
+    return;
+  }
+
   document.title = META[route] || META.dashboard;
 
-  // Auth guard
-  if (PROTECTED.includes(route) && !isOwner()) {
+  // Close any open modal before switching pages (backdrops live on <body>).
+  document.querySelectorAll('.ow-modal-backdrop').forEach(el => el.remove());
+
+  const loader = document.getElementById('ow-loader');
+
+  // Fresh #app on every navigation so leftover page-level delegated listeners
+  // (e.g. Dashboard's [data-booking-id] handler) are discarded with the old node.
+  const oldApp = document.getElementById('app');
+  const app = document.createElement('main');
+  app.id = 'app';
+  app.className = 'page';
+  app.tabIndex = -1;
+  app.setAttribute('aria-label', 'Main content');
+  oldApp.replaceWith(app);
+
+  // Auth guard: redirect to login if not authenticated (except login route itself)
+  if (route !== 'login' && requiresOwner()) {
     location.hash = '#login';
     return;
   }
 
-  // Hide onboarding guard check is handled inside dashboard
-  const app = document.getElementById('app');
-  const loader = document.getElementById('ow-loader');
+  // If logged in and on login page, redirect to appropriate page
+  if (route === 'login' && isOwner()) {
+    const config = await import('./data.js').then(m => m.getShopConfig());
+    location.hash = config.onboarded ? '#dashboard' : '#onboarding';
+    return;
+  }
 
   updateNav(route);
-
-  // Show/hide shell elements
-  const sidebar = document.getElementById('ow-sidebar');
-  const bottomNav = document.getElementById('ow-bottom-nav');
-  const isLoginRoute = route === 'login';
-  if (sidebar) sidebar.hidden = isLoginRoute;
-  if (bottomNav) bottomNav.hidden = isLoginRoute;
 
   if (loader) loader.hidden = false;
   try {
