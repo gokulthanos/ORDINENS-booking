@@ -1,4 +1,4 @@
-import { getShops, getServices } from '../data.js';
+import { getShops } from '../data.js';
 import { formatINR, escapeHtml } from '../utils.js';
 import { currentUser } from '../auth.js';
 
@@ -44,16 +44,6 @@ function areaSections(shops) {
     .join('');
 }
 
-function serviceRowHTML(s) {
-  return `
-    <div class="service-row">
-      <div class="service-row-main">
-        <span class="service-name">${escapeHtml(s.name)}</span>
-        <span class="service-price">${formatINR(s.price)}</span>
-      </div>
-    </div>`;
-}
-
 export default function mountHome(root) {
   const user = currentUser();
   const greeting = document.getElementById('home-greeting');
@@ -62,11 +52,9 @@ export default function mountHome(root) {
   }
 
   const allShops = getShops().filter((s) => s.onboarded !== false && s.status !== 'closed');
-  const allServices = getServices().filter((s) => s.active !== false);
 
   const nearbyEl = document.getElementById('nearby-shops');
   const moreEl = document.getElementById('more-shops');
-  const popularEl = document.getElementById('popular-services');
   const searchEl = document.getElementById('home-search');
 
   const CUSTOMER_LOCATION = CUSTOMER_AREA;
@@ -87,18 +75,10 @@ export default function mountHome(root) {
       : '<p class="empty-state">No more shops to show.</p>';
   }
 
-  function renderPopular() {
-    popularEl.innerHTML = allServices
-      .slice(0, 6)
-      .map(serviceRowHTML)
-      .join('');
-  }
-
   function renderSearch(term) {
     const q = term.trim().toLowerCase();
     if (!q) {
       nearbyShops();
-      renderPopular();
       return;
     }
     const shops = allShops.filter(
@@ -108,18 +88,18 @@ export default function mountHome(root) {
         (s.location || '').toLowerCase().includes(q) ||
         (s.services || []).some((sv) => sv.name.toLowerCase().includes(q))
     );
-    nearbyEl.innerHTML = areaSections(shops);
-    moreEl.innerHTML = '';
-    popularEl.innerHTML =
-      allServices
-        .filter((s) => s.name.toLowerCase().includes(q))
-        .slice(0, 8)
-        .map(serviceRowHTML)
-        .join('') || '<p class="empty-state">No matching services.</p>';
+    if (shops.length > 0) {
+      const first = shops.slice(0, 3);
+      const rest = shops.slice(3);
+      nearbyEl.innerHTML = areaSections(first);
+      moreEl.innerHTML = rest.length ? areaSections(rest) : '';
+    } else {
+      nearbyEl.innerHTML = '<p class="empty-state">No matching shops found.</p>';
+      moreEl.innerHTML = '';
+    }
   }
 
   nearbyShops();
-  renderPopular();
 
   searchEl?.addEventListener('input', (e) => renderSearch(e.target.value));
 }
