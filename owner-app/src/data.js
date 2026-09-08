@@ -143,6 +143,13 @@ export function addHoliday(dateISO, label = 'Shop Closed') {
   return list;
 }
 
+export function updateHoliday(id, patch) {
+  const list = getHolidays().map(h => h.id === id ? { ...h, ...patch } : h);
+  list.sort((a, b) => a.dateISO < b.dateISO ? -1 : 1);
+  saveHolidays(list);
+  return list.find(h => h.id === id) || null;
+}
+
 export function removeHoliday(id) {
   saveHolidays(getHolidays().filter(h => h.id !== id));
 }

@@ -9,7 +9,6 @@ const controllers = {
   settings: () => import('./pages/settings.js').then((m) => m.default),
   booking: () => import('./pages/booking.js').then((m) => m.default),
   confirmation: () => import('./pages/confirmation.js').then((m) => m.default),
-  login: () => import('./pages/login.js').then((m) => m.default),
   admin: () => import('./admin/admin.js').then((m) => m.default),
 };
 
@@ -21,7 +20,6 @@ const META = {
   settings: ['Settings — Ordinens Tech'],
   booking: ['Book a Slot — Ordinens Tech'],
   confirmation: ['Booking Confirmed — Ordinens Tech'],
-  login: ['Sign In — Ordinens Tech'],
   admin: ['Admin Panel — Ordinens Tech'],
   'admin/services': ['Admin / Services — Ordinens Tech'],
   'admin/staff': ['Admin / Barbers — Ordinens Tech'],

@@ -68,13 +68,13 @@ function render(app) {
           <div class="ow-form-row">
             <div class="ow-form-group" id="fg-sv-dur">
               <label class="ow-label" for="sv-duration">Duration (minutes) *</label>
-              <input id="sv-duration" class="ow-input" type="number" min="5" max="360" placeholder="30" required />
-              <span class="ow-field-error">Enter a valid duration (5–360 min).</span>
+              <input id="sv-duration" class="ow-input" type="number" min="1" max="360" placeholder="30" required />
+              <span class="ow-field-error">Duration is required and must be greater than 0.</span>
             </div>
             <div class="ow-form-group" id="fg-sv-price">
               <label class="ow-label" for="sv-price">Price (₹) *</label>
               <input id="sv-price" class="ow-input" type="number" min="0" placeholder="150" required />
-              <span class="ow-field-error">Enter a valid price (≥ 0).</span>
+              <span class="ow-field-error">Price is required and must not be negative.</span>
             </div>
           </div>
           <div class="ow-form-group">
@@ -165,9 +165,9 @@ function render(app) {
 
     let valid = true;
     document.getElementById('fg-sv-name').classList.toggle('error', !name);
-    document.getElementById('fg-sv-dur').classList.toggle('error', !duration || duration < 5);
+    document.getElementById('fg-sv-dur').classList.toggle('error', !duration || duration <= 0);
     document.getElementById('fg-sv-price').classList.toggle('error', isNaN(price) || price < 0);
-    if (!name || !duration || duration < 5 || isNaN(price) || price < 0) valid = false;
+    if (!name || !duration || duration <= 0 || isNaN(price) || price < 0) valid = false;
     if (!valid) return;
 
     const data = {

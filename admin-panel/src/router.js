@@ -3,8 +3,6 @@
    Dedicated hash router. All #admin/* routes REQUIRE an admin
    session. Unauthenticated access is redirected to #admin-login.
    ============================================================= */
-import { isAdmin } from './auth.js';
-import { mountLogin } from './pages/login/login.js';
 import { mountDashboard } from './pages/dashboard/dashboard.js';
 import { mountCustomers } from './pages/customers/customers.js';
 import { mountShops } from './pages/shops/shops.js';

@@ -7,6 +7,7 @@ export const STORAGE_KEYS = {
   services: 'pt_services',
   staff: 'pt_staff',
   shops: 'pt_shops',
+  holidays: 'ow_holidays',
 };
 
 export function readJSON(key, fallback) {

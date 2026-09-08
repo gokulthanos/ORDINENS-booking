@@ -412,9 +412,9 @@ function stepServices(el, app) {
     const price = Number(document.getElementById('svc-price').value);
     let valid = true;
     document.getElementById('fg-svc-name').classList.toggle('error', !name);
-    document.getElementById('fg-svc-dur').classList.toggle('error', !dur || dur < 5);
+    document.getElementById('fg-svc-dur').classList.toggle('error', !dur || dur <= 0);
     document.getElementById('fg-svc-price').classList.toggle('error', price < 0 || isNaN(price));
-    if (!name || !dur || dur < 5 || price < 0 || isNaN(price)) valid = false;
+    if (!name || !dur || dur <= 0 || price < 0 || isNaN(price)) valid = false;
     if (!valid) return;
     addService({ name, duration: dur, price, active: true, description: '' });
     services = getServices();
@@ -564,5 +564,6 @@ function stepGoLive(el, app) {
         <p style="color:var(--text-muted); max-width:300px;">Slots are now generated based on your configuration. Customer booking requests will appear in the Dashboard and Bookings pages.</p>
         <a href="#dashboard" class="ow-btn ow-btn-primary ripple" style="margin-top:8px;">Go to Dashboard →</a>
       </div>`;
+    setTimeout(() => { location.hash = '#dashboard'; }, 800);
   });
 }

@@ -4,7 +4,16 @@
    ============================================================= */
 import './styles/owner.css';
 import { handleRoute } from './router.js';
-import { isOwner } from './auth.js';
+import { ownerLogout } from './auth.js';
+
+// Logout button in the sidebar footer
+document.addEventListener('click', e => {
+  const logoutBtn = e.target.closest('#sidebar-logout');
+  if (logoutBtn) {
+    ownerLogout();
+    location.hash = '#login';
+  }
+});
 
 function initRipple() {
   document.addEventListener('click', e => {
@@ -41,7 +50,7 @@ function init() {
   initRipple();
   initMoreDrawer();
 
-  if (!location.hash) history.replaceState(null, '', isOwner() ? '#dashboard' : '#login');
+  if (!location.hash) history.replaceState(null, '', '#dashboard');
   handleRoute();
   window.addEventListener('hashchange', handleRoute);
 }
