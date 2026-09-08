@@ -98,5 +98,172 @@
       { "id": "svc-colour", "name": "Hair Colour", "price": 500, "duration": 60, "active": true }
     ],
     "onboarded": true
+  },
+  {
+    "id": "shop-urban-style",
+    "name": "Urban Style Men's Salon",
+    "shopType": "salon",
+    "phone": "+91 98765 10004",
+    "address": "72 DB Road, RS Puram, Coimbatore",
+    "description": "Contemporary styling lounge specializing in modern haircuts, beard sculpting, and detox hair treatments.",
+    "location": "Coimbatore",
+    "area": "RS Puram",
+    "status": "open",
+    "capacity": 3,
+    "bookingWindow": 30,
+    "cancellationHours": 2,
+    "workingHours": {
+      "sun": { "open": true, "start": "09:00", "end": "21:30" },
+      "mon": { "open": true, "start": "09:00", "end": "21:30" },
+      "tue": { "open": true, "start": "09:00", "end": "21:30" },
+      "wed": { "open": true, "start": "09:00", "end": "21:30" },
+      "thu": { "open": true, "start": "09:00", "end": "21:30" },
+      "fri": { "open": true, "start": "09:00", "end": "21:30" },
+      "sat": { "open": true, "start": "09:00", "end": "21:30" }
+    },
+    "breaks": [
+      { "id": "brk-lunch", "label": "Lunch Break", "start": "13:00", "end": "14:00" },
+      { "id": "brk-tea", "label": "Tea Break", "start": "17:00", "end": "17:30" }
+    ],
+    "services": [
+      { "id": "svc-classic", "name": "Classic Cut", "price": 180, "duration": 30, "active": true },
+      { "id": "svc-beard", "name": "Beard Sculpting", "price": 130, "duration": 25, "active": true },
+      { "id": "svc-spa", "name": "Signature Hair Spa", "price": 450, "duration": 45, "active": true },
+      { "id": "svc-glow", "name": "Face Glow Treatment", "price": 350, "duration": 30, "active": true }
+    ],
+    "onboarded": true
+  },
+  {
+    "id": "shop-scissors-comb",
+    "name": "Scissors & Comb Studio",
+    "shopType": "barber shop",
+    "phone": "+91 98765 10005",
+    "address": "18 Avinashi Road, Peelamedu, Coimbatore",
+    "description": "Expert precision hair cutting and traditional hot towel shaves. Relaxing ambience with professional stylists.",
+    "location": "Coimbatore",
+    "area": "Peelamedu",
+    "status": "open",
+    "capacity": 2,
+    "bookingWindow": 30,
+    "cancellationHours": 2,
+    "workingHours": {
+      "sun": { "open": true, "start": "09:30", "end": "21:00" },
+      "mon": { "open": true, "start": "09:30", "end": "21:00" },
+      "tue": { "open": true, "start": "09:30", "end": "21:00" },
+      "wed": { "open": true, "start": "09:30", "end": "21:00" },
+      "thu": { "open": true, "start": "09:30", "end": "21:00" },
+      "fri": { "open": true, "start": "09:30", "end": "21:00" },
+      "sat": { "open": true, "start": "09:30", "end": "21:00" }
+    },
+    "breaks": [
+      { "id": "brk-lunch", "label": "Lunch Break", "start": "13:30", "end": "14:30" }
+    ],
+    "services": [
+      { "id": "svc-textured", "name": "Textured Crop Cut", "price": 160, "duration": 30, "active": true },
+      { "id": "svc-towel", "name": "Hot Towel Shave", "price": 140, "duration": 25, "active": true },
+      { "id": "svc-combo", "name": "Hair + Beard Combo", "price": 260, "duration": 45, "active": true },
+      { "id": "svc-charcoal", "name": "Charcoal Detox Cleanup", "price": 300, "duration": 30, "active": true }
+    ],
+    "onboarded": true
+  },
+  {
+    "id": "shop-royal-touch",
+    "name": "Royal Touch Barber Lounge",
+    "shopType": "salon",
+    "phone": "+91 98765 10006",
+    "address": "55 NSR Road, Saibaba Colony, Coimbatore",
+    "description": "Luxury grooming experience for men and children. Top-notch fades, beard care, and rejuvenating skin treatments.",
+    "location": "Coimbatore",
+    "area": "Saibaba Colony",
+    "status": "open",
+    "capacity": 4,
+    "bookingWindow": 30,
+    "cancellationHours": 2,
+    "workingHours": {
+      "sun": { "open": true, "start": "08:30", "end": "21:30" },
+      "mon": { "open": true, "start": "08:30", "end": "21:30" },
+      "tue": { "open": true, "start": "08:30", "end": "21:30" },
+      "wed": { "open": true, "start": "08:30", "end": "21:30" },
+      "thu": { "open": true, "start": "08:30", "end": "21:30" },
+      "fri": { "open": true, "start": "08:30", "end": "21:30" },
+      "sat": { "open": true, "start": "08:30", "end": "21:30" }
+    },
+    "breaks": [
+      { "id": "brk-lunch", "label": "Lunch Break", "start": "13:00", "end": "14:00" },
+      { "id": "brk-tea", "label": "Tea Break", "start": "17:00", "end": "17:30" }
+    ],
+    "services": [
+      { "id": "svc-exec", "name": "Executive Haircut", "price": 200, "duration": 30, "active": true },
+      { "id": "svc-royal-beard", "name": "Royal Beard Styling", "price": 150, "duration": 30, "active": true },
+      { "id": "svc-dandruff", "name": "Anti-Dandruff Therapy", "price": 400, "duration": 40, "active": true },
+      { "id": "svc-spa-msg", "name": "Premium Hair Spa & Massage", "price": 550, "duration": 50, "active": true }
+    ],
+    "onboarded": true
+  },
+  {
+    "id": "shop-blade-fade",
+    "name": "The Blade & Fade Co.",
+    "shopType": "barber shop",
+    "phone": "+91 98765 10007",
+    "address": "104 Sathy Road, Saravanampatti, Coimbatore",
+    "description": "Trendy urban barbershop specializing in sharp taper fades, graphic line-ups, and modern beard designs.",
+    "location": "Coimbatore",
+    "area": "Saravanampatti",
+    "status": "open",
+    "capacity": 3,
+    "bookingWindow": 30,
+    "cancellationHours": 2,
+    "workingHours": {
+      "sun": { "open": true, "start": "09:00", "end": "21:00" },
+      "mon": { "open": true, "start": "09:00", "end": "21:00" },
+      "tue": { "open": true, "start": "09:00", "end": "21:00" },
+      "wed": { "open": true, "start": "09:00", "end": "21:00" },
+      "thu": { "open": true, "start": "09:00", "end": "21:00" },
+      "fri": { "open": true, "start": "09:00", "end": "21:00" },
+      "sat": { "open": true, "start": "09:00", "end": "21:00" }
+    },
+    "breaks": [
+      { "id": "brk-lunch", "label": "Lunch Break", "start": "13:00", "end": "14:00" }
+    ],
+    "services": [
+      { "id": "svc-fade", "name": "Sharp Skin Fade", "price": 220, "duration": 35, "active": true },
+      { "id": "svc-lineup", "name": "Line Up & Beard Shaping", "price": 120, "duration": 20, "active": true },
+      { "id": "svc-combo", "name": "Fade + Beard Duo", "price": 300, "duration": 50, "active": true },
+      { "id": "svc-keratin", "name": "Keratin Smoothening", "price": 800, "duration": 60, "active": true }
+    ],
+    "onboarded": true
+  },
+  {
+    "id": "shop-classic-man",
+    "name": "Classic Man Grooming",
+    "shopType": "barber shop",
+    "phone": "+91 98765 10008",
+    "address": "33 Palakkad Main Road, Kuniyamuthur, Coimbatore",
+    "description": "Old-school charm meets modern grooming techniques. Fast, affordable, and high-quality haircuts.",
+    "location": "Coimbatore",
+    "area": "Kuniyamuthur",
+    "status": "open",
+    "capacity": 2,
+    "bookingWindow": 30,
+    "cancellationHours": 2,
+    "workingHours": {
+      "sun": { "open": true, "start": "09:00", "end": "21:00" },
+      "mon": { "open": true, "start": "09:00", "end": "21:00" },
+      "tue": { "open": true, "start": "09:00", "end": "21:00" },
+      "wed": { "open": true, "start": "09:00", "end": "21:00" },
+      "thu": { "open": true, "start": "09:00", "end": "21:00" },
+      "fri": { "open": true, "start": "09:00", "end": "21:00" },
+      "sat": { "open": true, "start": "09:00", "end": "21:00" }
+    },
+    "breaks": [
+      { "id": "brk-lunch", "label": "Lunch Break", "start": "13:00", "end": "14:00" }
+    ],
+    "services": [
+      { "id": "svc-gentleman", "name": "Gentleman's Cut", "price": 140, "duration": 25, "active": true },
+      { "id": "svc-shave", "name": "Classic Shave", "price": 80, "duration": 20, "active": true },
+      { "id": "svc-oil-msg", "name": "Head Massage with Oil", "price": 150, "duration": 20, "active": true },
+      { "id": "svc-total", "name": "Total Grooming Package", "price": 320, "duration": 55, "active": true }
+    ],
+    "onboarded": true
   }
 ]

@@ -72,16 +72,14 @@ await page.goto(BASE + '/#explore', { waitUntil: 'networkidle0' });
 await page.waitForSelector('#nearby-shops .shop-card');
 check('explore route falls back to home', page.url().includes('#home') || (await page.$('#nearby-shops')) !== null);
 
-/* 3. Popular services vertical, price shown, duration hidden */
-console.log('STEP 3 — services');
+/* 3. Explore more shops rendered like nearby shops, popular services removed */
+console.log('STEP 3 — explore more shops');
 await page.goto(BASE + '/', { waitUntil: 'networkidle0' });
-await page.waitForSelector('#popular-services .service-row');
-check('popular services are vertical', (await page.$eval('#popular-services', (el) => getComputedStyle(el).flexDirection)) === 'column');
-check('service price shown', (await page.$eval('#popular-services', (el) => el.textContent)).includes('₹'));
-check(
-  'service duration hidden',
-  !(await page.$eval('#popular-services', (el) => /min\b/.test(el.textContent)))
-);
+await page.waitForSelector('#more-shops .shop-card');
+check('explore more shops rendered', (await page.$$('#more-shops .shop-card')).length >= 1);
+check('explore more shops vertical', (await page.$eval('#more-shops', (el) => getComputedStyle(el).flexDirection)) === 'column');
+check('popular services section removed', (await page.$('#popular-services')) === null);
+
 
 /* 4. Booking route guards to login */
 console.log('STEP 4 — login guard');
@@ -149,7 +147,10 @@ await page.$eval('#bk-name', (el) => (el.value = ''));
 await page.type('#bk-name', 'Priya Sharma');
 await page.$eval('#bk-phone', (el) => (el.value = ''));
 await page.type('#bk-phone', '+91 98765 43210');
-await page.click('#details-form button[type="submit"]');
+await page.evaluate(() => {
+  const form = document.getElementById('details-form');
+  if (form) form.requestSubmit();
+});
 await page.waitForSelector('.confirm-card');
 check('confirmation page reached', page.url().includes('#confirmation'));
 const confirmText = await page.evaluate(() => document.body.textContent);

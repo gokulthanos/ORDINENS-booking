@@ -137,6 +137,11 @@ function buildCustomerBookings() {
     { id: 'shop-kings', name: 'Kings Barber Studio' },
     { id: 'shop-elite', name: 'Elite Cuts' },
     { id: 'shop-grooming', name: 'The Grooming Lounge' },
+    { id: 'shop-urban-style', name: "Urban Style Men's Salon" },
+    { id: 'shop-scissors-comb', name: 'Scissors & Comb Studio' },
+    { id: 'shop-royal-touch', name: 'Royal Touch Barber Lounge' },
+    { id: 'shop-blade-fade', name: 'The Blade & Fade Co.' },
+    { id: 'shop-classic-man', name: 'Classic Man Grooming' },
   ];
   const cust = DEMO_CUSTOMERS;
   const now = new Date();
