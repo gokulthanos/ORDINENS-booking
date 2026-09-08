@@ -5,7 +5,20 @@ import { STORAGE_KEYS, readJSON, writeJSON, uid, toISO, fromISO } from './utils.
 
 /* ------------------------------ Shops ------------------------------- */
 export function getShops() {
-  return readJSON(STORAGE_KEYS.shops, seedShops);
+  const stored = readJSON(STORAGE_KEYS.shops, null);
+  if (!stored) return seedShops;
+  const ids = new Set(stored.map((s) => s.id));
+  let modified = false;
+  for (const s of seedShops) {
+    if (!ids.has(s.id)) {
+      stored.push(s);
+      modified = true;
+    }
+  }
+  if (modified) {
+    saveShops(stored);
+  }
+  return stored;
 }
 
 export function getShop(id) {
