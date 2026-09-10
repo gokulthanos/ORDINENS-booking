@@ -1,6 +1,7 @@
 import './styles.css';
 import { handleRoute, updateAuthChip } from './router.js';
 import { runSplash } from './splash.js';
+import { initLiveLocation } from './location.js';
 import * as auth from './auth.js';
 
 function syncGreeting() {
@@ -16,6 +17,7 @@ function initApp() {
   const yearEl = document.getElementById('year');
   if (yearEl) yearEl.textContent = new Date().getFullYear();
   syncGreeting();
+  initLiveLocation();
 
   document.addEventListener('pt:userchange', syncGreeting);
   window.addEventListener('hashchange', handleRoute);

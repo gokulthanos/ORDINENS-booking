@@ -2,7 +2,10 @@ import { getShops } from '../data.js';
 import { formatINR, escapeHtml } from '../utils.js';
 import { currentUser } from '../auth.js';
 
-const CUSTOMER_AREA = 'Coimbatore';
+function getCustomerLocation() {
+  const el = document.getElementById('location-text');
+  return el ? el.textContent.trim() : 'Coimbatore';
+}
 
 function shopCardHTML(s) {
   return `
@@ -57,7 +60,7 @@ export default function mountHome(root) {
   const moreEl = document.getElementById('more-shops');
   const searchEl = document.getElementById('home-search');
 
-  const CUSTOMER_LOCATION = CUSTOMER_AREA;
+  const CUSTOMER_LOCATION = getCustomerLocation();
 
   function nearbyShops() {
     const localized = allShops.filter(
