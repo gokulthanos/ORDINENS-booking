@@ -1,52 +1,73 @@
-# Ordinens Tech — Booking App
+# Ordinens Tech — Booking Platform
 
-A premium, dark-mode glassmorphic slot-booking web app for Ordinens Tech. Built with **Vite + vanilla JS & CSS** (no framework), using `localStorage` for demo persistence.
+Customer-facing booking app for Ordinens Tech, built as a **React Native + Expo** application using **TypeScript**, **Expo Router**, and **Supabase**.
 
 ## Quick start
 
 ```bash
+cd customer-app
 npm install
-npm run dev        # dev server (http://localhost:5173)
-npm run build      # production build to dist/
-npm run verify     # headless end-to-end check (Chrome)
+npx expo start        # dev server (Expo Go / emulator / web)
 ```
 
-## Routes
+Other useful commands inside `customer-app/`:
 
-| Route              | Purpose                                          |
-| ------------------ | ------------------------------------------------ |
-| `#home`            | Landing page                                     |
-| `#services`        | Services & pricing (filter by duration)           |
-| `#staff`           | Barbers (pick one → jumps into the booking flow)  |
-| `#booking`         | 4-step booking flow (login required)              |
-| `#confirmation`    | Confirmation with animated check + iCal download  |
-| `#login`           | Login by email or 10-digit phone                  |
-| `#admin`           | Admin dashboard (password protected)              |
-| `#admin/services`  | Service CRUD                                       |
-| `#admin/staff`     | Barber CRUD                                        |
-| `#admin/bookings`  | Bookings table with filters & status mgmt          |
+```bash
+npx tsc --noEmit       # TypeScript check
+npx expo-doctor        # project health check
+npm run lint           # ESLint
+npx expo start --android
+npx expo start --ios
+```
 
-**Admin key:** `pentane` (change `ADMIN_PASSWORD` in `src/auth.js`).
+## Project layout
+
+```
+customer-app/
+├── app/                      # Expo Router screens
+│   ├── (auth)/index.tsx      # Login / Register
+│   ├── (tabs)/               # Home, Search, Bookings, Profile
+│   ├── shop/[id].tsx         # Shop details + services
+│   └── booking/              # Booking form + confirmation
+├── src/
+│   ├── components/           # ShopCard, ServiceCard, BookingCard, EmptyState, LoadingState
+│   ├── constants/theme.ts    # Colors, spacing, shadows
+│   ├── data/                 # Seed shops / services / staff
+│   ├── hooks/useAuth.tsx     # Auth context (Supabase session)
+│   ├── lib/supabase.ts       # Supabase client (AsyncStorage persistence)
+│   ├── services/             # Supabase data layer with offline fallback
+│   ├── types/                # TypeScript interfaces
+│   └── utils/                # Booking slot engine, formatters, storage helpers
+├── assets/                   # Icons, splash & branding
+├── app.json                  # Expo config
+├── .env                      # Supabase credentials (EXPO_PUBLIC_*)
+```
 
 ## How the booking flow works
 
-1. `#booking` is guarded by login → redirects to `#login` (`pt_next` remembers where you came from).
-2. Step-by-step: service → barber → date + time → details.
-3. The slot engine (`src/data.js` → `generateSlots`) generates 30-min slots inside a barber's working hours, honoring each service's duration, the barber's weekly off-days, and a 15-min cleanup gap so two bookings never overlap.
-4. On confirm the booking is written to `localStorage` (`pt_bookings`) and you land on `#confirmation` with an iCal file ready to download.
+1. Customers log in with a phone number or email (`(auth)` screen).
+2. Home/Search surfaces live shops; a shop page lists its services.
+3. The booking screen enforces a **3-day window** and splits each day into
+   **Morning / Afternoon / Evening** periods.
+4. The slot engine (`src/utils/dataUtils.ts`) generates 30-minute slots inside
+   working hours, honoring breaks, holidays, weekly off-days, service duration,
+   and shop capacity. Unavailable periods are disabled.
+5. Confirming a booking requires an **advance payment** (20% of the service price,
+   currently a simulated flow — payment gateway integration pending).
+6. The booking is written to Supabase with offline fallback, and appears under
+   **My Bookings** with status.
 
 ## Data & persistence
 
-- Seed data lives in `src/data/services.json` and `src/data/staff.json`.
-- Once rewritten (admin CRUD) the lists are stored in `localStorage` under `pt_services` / `pt_staff`.
-- Bookings and session state use `pt_bookings`, `pt_session`, `pt_users`; theme preference uses `pt_theme`.
+- Live data comes from **Supabase** (shops, services, bookings).
+- If Supabase is unreachable, the app falls back to seed data
+  (`src/data/*.json`) and local storage (`@react-native-async-storage/async-storage`).
 
-Because this is front-end only, nothing survives a storage clear — swap `src/data.js` + `src/auth.js` for a real API when ready.
+## Configuration
 
-## Theming
+Copy `.env` values from the Supabase project. The client uses:
 
-Dark glassmorphic is the default. The sun/moon button in the header toggles a light theme; the choice persists in localStorage. All colors are CSS variables in `src/styles.css`.
-
-## Notes from the PRD
-
-The PRD (`Pentane_Tech_Barber_Salon_PRD_V2 (1).docx`) marks per-barber selection as MVP out-of-scope — the message plan explicitly includes it, so this build ships the barber selection feature. Payment remains stubbed (open PRD decision).
+```env
+EXPO_PUBLIC_SUPABASE_URL=...
+EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY=...
+```

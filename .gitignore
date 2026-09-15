@@ -1,8 +1,9 @@
 # Dependencies
 node_modules/
 
-# Build output (vite)
+# Build output
 dist/
+dist-check/
 
 # Logs & OS junk
 *.log
